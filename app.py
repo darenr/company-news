@@ -21,7 +21,7 @@ def format_datetime(value, format="%Y-%m-%d"):
 
 app.jinja_env.filters['datetime'] = format_datetime
 
-def get_stock_data(symbol, news_count=50, competitors=None):
+def get_stock_data(symbol, news_count=50):
     j = requests.get('https://api.iextrading.com/1.0/stock/%s/batch?types=quote,logo,company,financials,relevant,news&range=6m&last=%d' % (symbol, news_count)).json()
 
     # postive change is up/down for easy icon rendering
@@ -31,9 +31,12 @@ def get_stock_data(symbol, news_count=50, competitors=None):
         j['quote']['direction'] = 'down'
 
     del j['financials']['financials'][0]['cashChange']
+    del j['financials']['financials'][0]['operatingGainsLosses']
 
     # now get competitor news:
-    if not competitors:
+    if symbol.upper() == 'ORCL':
+        competitors="MSFT,CRM,WDAY,IBM,INTC,SAP"
+    else:
         competitors = ",".join(j['relevant']['symbols'])
     j['competitors'] = requests.get('https://api.iextrading.com/1.0/stock/market/batch?symbols=%s&types=quote,news&range=1m&last=5' % (competitors)).json()
 
@@ -42,7 +45,7 @@ def get_stock_data(symbol, news_count=50, competitors=None):
 
 @app.route('/')
 def orcl():
-    return render_template('index.html', data = get_stock_data('orcl', competitors="MSFT,CRM,WDAY,IBM,INTC,SAP"))
+    return render_template('index.html', data = get_stock_data('orcl'))
 
 @app.route('/<string:symbol>')
 def company(symbol):
