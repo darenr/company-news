@@ -1,0 +1,11 @@
+flask
+flask-compress
+flask-humanize
+gunicorn
+titlecase
+expiringdict
+lxml
+requests
+requests-cache
+beautifulsoup4
+html5lib
