@@ -1,1 +1,1 @@
-gunicorn -w 2 --bind drace.us.oracle.com:8042 app:app
+gunicorn -w 4 --bind drace.us.oracle.com:8042 app:app
